@@ -10,28 +10,57 @@ g++ -g -I util/include/ risingCity.cpp util/src/building.cpp util/src/redBlackTr
 #include "minHeap.h"
 #include "redBlackTree.h"
 
-#define INSERT "insert"
-#define PRINT "print"
+#define INSERTOP "Insert"
+#define PRINTOP "PrintBuilding"
+#define COLON ":"
+#define OPENBRACKET "("
+#define CLOSEBRACKET ")"
+#define COMMA ","
 
 using namespace std;
 
-void getData(string line, int &time, int &buildingNum, int &totalTime, string &operation){
+enum Operation {INSERT, PRINTBUILDING, PRINTRANGE};
+/*
+File Input Format
+0: Insert(50,20)
+16: PrintBuilding(0,100)
+*/
+
+void getData(string line, int &time, int &num1, int &num2, int &operation){
   size_t current, previous = 0;
-  string delim  = " ";
-  current = line.find(delim);
-  string temp[4];
-  int i = 0;
-  while (current != string::npos) {
-      temp[i] = line.substr(previous, current - previous);
-      previous = current + 1;
-      current = line.find(delim, previous);
-      i++;
+  string deling;
+  num1 = -1;
+  num2 = -1;
+
+  //get counter
+  current = line.find(COLON);
+  time = stoi(line.substr(previous, current - previous));
+  previous = current + 2;
+
+  //get operation
+  current = line.find(OPENBRACKET, previous);
+  string tmpOperation = line.substr(previous, current - previous);
+  previous = current + 1;
+  cout<<tmpOperation<<" "<<INSERTOP;
+  if(tmpOperation == INSERTOP){
+    cout<<"Set Insert"<<endl;
+    operation = INSERT;
+  }else{
+    operation = PRINTBUILDING;
   }
-  temp[i] = line.substr(previous, current - previous);
-  time = stoi(temp[0]);
-  operation = temp[1];
-  buildingNum = stoi(temp[2]);
-  totalTime = stoi(temp[3]);
+
+  //get buildingNum
+  current = line.find(COMMA, previous);
+  if(current != std::string::npos){
+    num1 = stoi(line.substr(previous, current - previous));
+    previous = current + 1;
+    if(operation == PRINTBUILDING)
+      operation = PRINTRANGE;
+  }
+
+  //read num2 or totalTime
+  current = line.find(CLOSEBRACKET, previous);
+  num2 = stoi(line.substr(previous, current - previous));
 }
 
 int main(int argc, char** argv){
@@ -43,24 +72,39 @@ int main(int argc, char** argv){
   string line;
   ifstream inputFile;
   redBlack redBlackTree;
-  RBNode *t;
+  RBNode *t, *r;
+  building *x;
   minHeap H;
   inputFile.open(filename);
   if (inputFile.is_open()){
     while ( getline (inputFile,line) ){
-      int time, buildingNum, totalTime;
-      string operation;
+      int time, num1, num2, operation;
       if(line.length()>0){
-        getData(line, time, buildingNum, totalTime, operation);
-        building *x = new building(buildingNum, totalTime);
-        x->print();
-        RBNode *r = new RBNode(x);
-        redBlackTree.insertNode(r);
-        heapNode hN(x,r);
-        H.insertNode(hN);
-        t = r;
+        cout<<line<<endl;
+        getData(line, time, num1, num2, operation);
+        cout<<time<<" "<<num1<<" "<<num2<<" "<<operation<<endl;
+        switch (operation) {
+          case INSERT:
+            {
+              x = new building(num1, num2);
+              x->print();
+              r = new RBNode(x);
+              redBlackTree.insertNode(r);
+              heapNode hN(x,r);
+              H.insertNode(hN);
+              t = r;
+            }
+            break;
+          case PRINTBUILDING:
+            redBlackTree.printBuilding(num2);
+            break;
+          case PRINTRANGE:
+            redBlackTree.printBuildingRange(num1, num2);
+            break;
+        }
       }
     }
+    
     H.getMin().getRBPtr()->print();
     cout<<"delete"<<endl;
     redBlackTree.deleteNode(H.getMin().getRBPtr());
