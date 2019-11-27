@@ -70,7 +70,6 @@ bool RBNode :: hasRedChild() {
          (right != NULL and right->color == RED);
 }
 
-
 void redBlack:: insertNode(RBNode* newNode){
   root = BSTInsert(root, newNode);
   fixViolation(root, newNode);
@@ -85,7 +84,7 @@ RBNode* redBlack:: BSTInsert(RBNode* root, RBNode* newNode){
       cout<<"Found Equal:Duplicate Entry:Exit"<<endl;
         exit(0);
     }
-    if (comparator == LESS){
+    else if (comparator == LESS){
         root->left  = BSTInsert(root->left, newNode);
         root->left->parent = root;
     }
@@ -367,6 +366,7 @@ void redBlack:: swapLeft(RBNode* x, RBNode* y){
   x->left->parent = y;
   swap(x->left, y->left);
 }
+
 void redBlack:: swapRight(RBNode* x, RBNode* y){
   if(x->right && y->right)
     swap(x->right->parent, y->right->parent);
@@ -381,6 +381,7 @@ void redBlack:: swapRight(RBNode* x, RBNode* y){
     y->right = x;
   }
 }
+
 void redBlack:: swapParent(RBNode* x, RBNode* y){
   //RBNode *xParentChild = NULL, *yParentChild = NULL;
   if(x->parent){
@@ -412,7 +413,10 @@ void redBlack:: swapNodes(RBNode* x, RBNode* y){
 
 
 }
+
 void redBlack:: deleteNode(RBNode* v){
+  if(v == NULL)
+    return;
   RBNode *u = BSTreplace(v);
 
       // True when u and v are both black
@@ -525,3 +529,51 @@ void redBlack :: rightRotate(RBNode *x) {
     // connect new parent with x
     nParent->right = x;
   }
+
+void redBlack:: printBuilding(int buildingNum){
+  search(this->root, buildingNum);
+}
+
+void redBlack:: search(RBNode *x, int buildingNum){
+  if (x == NULL){
+    cout<<"0 0 0"<<endl;
+    return;
+  }
+  if(x->dataNode->getBuildingNum() == buildingNum){
+      x->dataNode->print();
+  }
+  else if (x->dataNode->getBuildingNum() > buildingNum){
+      search(x->left, buildingNum);
+  }
+  else{
+      search(x->right, buildingNum);
+  }
+}
+
+void redBlack:: printBuildingRange(int lower, int upper){
+  searchRange(this->root, lower, upper);
+}
+
+void redBlack:: searchRange(RBNode *x, int lower, int upper){
+  if (x == NULL){
+    cout<<"0 0 0"<<endl;
+    return;
+  }
+  if (x->dataNode->getBuildingNum() > upper){
+    searchRange(x->left, lower, upper);
+  }else if(x->dataNode->getBuildingNum() < lower){
+    searchRange(x->right, lower, upper);
+  }else{
+    rangeInorder(x, lower, upper);
+  }
+}
+
+void redBlack:: rangeInorder(RBNode *root, int lower, int upper){
+    if (root == NULL)
+        return;
+    if (root->dataNode->getBuildingNum() >= lower){
+      rangeInorder(root->left, lower, upper);
+      root->dataNode->print();
+    }
+    rangeInorder(root->right, lower, upper);
+}

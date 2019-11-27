@@ -16,6 +16,7 @@ public:
   void updateExecutedTime(int executedTime);
   int compareBuildNum(building *);
   int compareExecuteTime(building *);
+  int getBuildingNum();
 };
 
 #endif

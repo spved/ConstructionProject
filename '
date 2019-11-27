@@ -1,0 +1,4 @@
+g++ -g -I util/include/ -c util/src/redBlackTree.cpp
+g++ -g -I util/include/ -c util/src/building.cpp
+g++ -g -I util/include/ -c util/src/minHeap.cpp
+g++ -g -I util/include/ risingCity.cpp util/src/building.cpp util/src/redBlackTree.cpp -o risingCity minHeap.o

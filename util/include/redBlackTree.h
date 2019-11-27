@@ -48,12 +48,16 @@ private:
   void fixDoubleBlack(RBNode *);
   RBNode* successor(RBNode *);
   RBNode* BSTreplace(RBNode *);
-
+  void search(RBNode *, int);
+  void searchRange(RBNode *,int , int);
+  void rangeInorder(RBNode *,int , int);
 public:
   redBlack();
   void insertNode(RBNode *);
   void deleteNode(RBNode *);
   void printInOrder();
+  void printBuilding(int);
+  void printBuildingRange(int lower, int upper);
 
 };
 

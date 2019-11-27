@@ -43,3 +43,7 @@ int building:: compareExecuteTime(building *a){
   }
   return EQUAL;
 }
+
+int building:: getBuildingNum(){
+  return this->buildingNum;
+}

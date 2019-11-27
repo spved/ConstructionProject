@@ -10,7 +10,6 @@ heapNode:: heapNode(building* dataNode, RBNode* RBPtr){
   this->RBPtr = RBPtr;
 }
 
-
 void heapNode:: updateRBPtr(RBNode* RBPtr){
   this->RBPtr = RBPtr;
 }
@@ -22,9 +21,11 @@ RBNode* heapNode:: getRBPtr(){
 int minHeap:: parent(int i){
   return (i - 1) / 2;
 }
+
 int minHeap:: left(int i){
   return 2*i+1;
 }
+
 int minHeap:: right(int i){
   return 2*i+2;
 }
@@ -32,6 +33,7 @@ int minHeap:: right(int i){
 int minHeap:: size(){
   return hNodes.size();
 }
+
 void minHeap:: heapifyUp(int index){
 		// check if node at index i and its parent violates
 		// the heap property
@@ -46,8 +48,7 @@ void minHeap:: heapifyUp(int index){
 		}
 }
 
-void minHeap:: heapifyDown(int index)
-	{
+void minHeap:: heapifyDown(int index){
     int size = this->size();
 		// get left and right child of node at index i
 		int leftChild = left(index);
@@ -97,6 +98,7 @@ void minHeap:: removeMin(){
 heapNode minHeap:: getMin(){
   return hNodes[0];
 }
+
 void minHeap:: print(){
   cout<<"Min Heap: ";
   for(int i = 0; i<size(); i++){
