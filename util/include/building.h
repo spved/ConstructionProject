@@ -17,6 +17,7 @@ public:
   int compareBuildNum(building *);
   int compareExecuteTime(building *);
   int getBuildingNum();
+  int getTimeToComplete();
 };
 
 #endif

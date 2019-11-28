@@ -17,6 +17,7 @@ public:
   heapNode(building* dataNode, RBNode* RBPtr);
   void updateRBPtr(RBNode* RBPtr);
   RBNode* getRBPtr();
+  building* getBuilding();
 
   friend class minHeap;
 };
@@ -39,6 +40,7 @@ public:
   void removeMin();
   heapNode getMin();
   void print();
+  bool isEmpty();
 };
 
 #endif

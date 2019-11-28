@@ -9,7 +9,7 @@ building:: building (int buildingNum, int totalTime){
 }
 
 void building:: print(){
-  cout<<buildingNum<<" "<<executedTime<<" "<<totalTime<<endl;
+  cout<<"("<<buildingNum<<","<<executedTime<<","<<totalTime<<")";
 }
 
 void building:: updateExecutedTime(int executedTime){
@@ -46,4 +46,8 @@ int building:: compareExecuteTime(building *a){
 
 int building:: getBuildingNum(){
   return this->buildingNum;
+}
+
+int building:: getTimeToComplete(){
+  return this->totalTime - this->executedTime;
 }

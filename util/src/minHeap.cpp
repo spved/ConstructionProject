@@ -18,6 +18,10 @@ RBNode* heapNode:: getRBPtr(){
   return this->RBPtr;
 }
 
+building* heapNode:: getBuilding(){
+  return this->dataNode;
+}
+
 int minHeap:: parent(int i){
   return (i - 1) / 2;
 }
@@ -81,7 +85,7 @@ void minHeap::insertNode(heapNode hNode){
 }
 
 void minHeap:: removeMin(){
-  cout<<"Heap Size : "<<size();
+  //cout<<"Heap Size : "<<size();
   if (size() == 0){
 		cout<<"Empty Heap";
     return;
@@ -92,7 +96,7 @@ void minHeap:: removeMin(){
   hNodes.pop_back();
 	// call heapify-down on root node
 	heapifyDown(0);
-  cout<<"Heap Size : "<<size();
+  //cout<<"Heap Size : "<<size();
 }
 
 heapNode minHeap:: getMin(){
@@ -105,4 +109,10 @@ void minHeap:: print(){
     hNodes[i].dataNode->print();
     hNodes[i].RBPtr->print();
   }
+}
+
+bool minHeap:: isEmpty(){
+  if(size() > 0)
+    return false;
+  return true;
 }

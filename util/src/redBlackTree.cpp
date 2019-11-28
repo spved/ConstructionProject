@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-
+int comma = 0;
 /*struct RBNode{
   building* dataNode;
   //minHeap* heapnewNoder;
@@ -19,7 +19,6 @@ RBNode::RBNode(building* dataNode){
 }
 
 void RBNode::print(){
-  cout<<"color : "<<color<<" ";
   this->dataNode->print();
 }
 
@@ -363,22 +362,25 @@ RBNode* redBlack:: BSTreplace(RBNode *x) {
   }
 
 void redBlack:: swapLeft(RBNode* x, RBNode* y){
-  x->left->parent = y;
+  if(x->left)
+    x->left->parent = y;
   swap(x->left, y->left);
 }
 
 void redBlack:: swapRight(RBNode* x, RBNode* y){
-  if(x->right && y->right)
-    swap(x->right->parent, y->right->parent);
-  else if(x->right)
-    x->right->parent = y;
-  else if(y->right)
-    y->right->parent = x;
-  if(x->parent->left == x)
-    swap(x->right, y->right);
-  else{
-    x->right = y->right;
-    y->right = x;
+  if(x->parent->left == x){
+    if(x->right && y->right)
+        swap(x->right->parent, y->right->parent);
+      else if(x->right)
+        x->right->parent = y;
+      else if(y->right)
+        y->right->parent = x;
+        swap(x->right, y->right);
+    }else{
+
+      x->right = y->right;
+      y->right->parent = x;
+      y->right = x;
   }
 }
 
@@ -394,6 +396,7 @@ void redBlack:: swapParent(RBNode* x, RBNode* y){
     y->parent->left = x;
     swap(x->parent, y->parent);
   }else{
+    y->parent = x->parent;
     x->parent = y;
   }
 }
@@ -407,11 +410,43 @@ void redBlack:: swapNodes(RBNode* x, RBNode* y){
   //swap righ
     swapRight(x,y);
   */
-  swapLeft(x,y);
+  /*swapLeft(x,y);
   swapParent(x,y);
   swapRight(x,y);
+  */
 
+  if(x->left)
+    x->left->parent = y;
+  swap(x->left, y->left);
 
+  if(x->parent){
+    if(x->parent->left == x)
+      x->parent->left = y;
+    else
+      x->parent->right = y;
+  }
+  if(y->parent->left == y){
+    y->parent->left = x;
+    swap(x->parent, y->parent);
+
+    if(x->right && y->right)
+        swap(x->right->parent, y->right->parent);
+    else if(x->right)
+        x->right->parent = y;
+    else if(y->right)
+        y->right->parent = x;
+    swap(x->right, y->right);
+  }else{
+    if(y->right){
+      y->right->parent = x;
+      x->right = y->right;
+    }else{
+      x->right = NULL;
+    }
+    y->right = x;
+    y->parent = x->parent;
+    x->parent = y;
+  }
 }
 
 void redBlack:: deleteNode(RBNode* v){
@@ -536,11 +571,12 @@ void redBlack:: printBuilding(int buildingNum){
 
 void redBlack:: search(RBNode *x, int buildingNum){
   if (x == NULL){
-    cout<<"0 0 0"<<endl;
+    cout<<"(0,0,0)"<<endl;
     return;
   }
   if(x->dataNode->getBuildingNum() == buildingNum){
       x->dataNode->print();
+      cout<<endl;
   }
   else if (x->dataNode->getBuildingNum() > buildingNum){
       search(x->left, buildingNum);
@@ -552,11 +588,13 @@ void redBlack:: search(RBNode *x, int buildingNum){
 
 void redBlack:: printBuildingRange(int lower, int upper){
   searchRange(this->root, lower, upper);
+  cout<<endl;
 }
 
 void redBlack:: searchRange(RBNode *x, int lower, int upper){
+  comma = 0;
   if (x == NULL){
-    cout<<"0 0 0"<<endl;
+    cout<<"(0,0,0)";
     return;
   }
   if (x->dataNode->getBuildingNum() > upper){
@@ -573,6 +611,8 @@ void redBlack:: rangeInorder(RBNode *root, int lower, int upper){
         return;
     if (root->dataNode->getBuildingNum() >= lower){
       rangeInorder(root->left, lower, upper);
+      if(comma)
+        cout<<",";
       root->dataNode->print();
     }
     rangeInorder(root->right, lower, upper);
