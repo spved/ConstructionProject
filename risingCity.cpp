@@ -52,7 +52,7 @@ void performOp(int num1, int num2, int operation, redBlack *redBlackTree, minHea
         redBlackTree->printBuildingRange(num1, num2);
         break;
     }
-  
+
 }
 void getData(string line, int &time, int &num1, int &num2, int &operation){
   size_t current, previous = 0;
@@ -115,6 +115,25 @@ int main(int argc, char** argv){
         while(isDataPresesnt || !H.isEmpty()){
         //cout<<line<<endl;
           //H.print();
+          if(H.isEmpty()){
+            if(readLine && isDataPresesnt){
+              if(getline (inputFile,line)){
+                if(line.length()>0)
+                  cout<<line<<endl;
+                  getData(line, time, num1, num2, operation);
+                }else{
+                  isDataPresesnt = false;
+                }
+            }
+            if(time > global_counter){
+              readLine = false;
+            }else if(time == global_counter){
+              readLine = true;
+              performOp( num1, num2, operation, &redBlackTree, &H);
+            }
+            global_counter++;
+            continue;
+          }
           heapNode currentWorking = H.getMin();
           H.removeMin();
           int runtime = min(RUNCOUNTER, currentWorking.getBuilding()->getTimeToComplete());
@@ -124,7 +143,7 @@ int main(int argc, char** argv){
             if(readLine && isDataPresesnt){
               if(getline (inputFile,line)){
                 if(line.length()>0)
-                  cout<<line<<endl;
+                cout<<line<<endl;
                   getData(line, time, num1, num2, operation);
                 }else{
                   isDataPresesnt = false;
@@ -145,6 +164,7 @@ int main(int argc, char** argv){
             currentWorking.getRBPtr()->print();
             cout<<endl;
             redBlackTree.deleteNode(currentWorking.getRBPtr());
+            H.print();
           }else{
             H.insertNode(currentWorking);
           }

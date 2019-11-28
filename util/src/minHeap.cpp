@@ -108,7 +108,9 @@ void minHeap:: print(){
   for(int i = 0; i<size(); i++){
     hNodes[i].dataNode->print();
     hNodes[i].RBPtr->print();
+    cout<<" , ";
   }
+  cout<<endl;
 }
 
 bool minHeap:: isEmpty(){
