@@ -4,6 +4,7 @@ g++ -g -I util/include/ -c util/src/building.cpp
 g++ -g -I util/include/ -c util/src/minHeap.cpp
 g++ -g -I util/include/ risingCity.cpp util/src/building.cpp util/src/redBlackTree.cpp -o risingCity minHeap.o
 */
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -94,6 +95,7 @@ int main(int argc, char** argv){
     cout<<"Invalid Arguments"<<endl;
     exit(0);
   }
+  freopen("output.txt","w",stdout);
   string filename = argv[1];
   string line;
   ifstream inputFile;
@@ -119,7 +121,7 @@ int main(int argc, char** argv){
             if(readLine && isDataPresesnt){
               if(getline (inputFile,line)){
                 if(line.length()>0)
-                  cout<<line<<endl;
+                  //cout<<line<<endl;
                   getData(line, time, num1, num2, operation);
                 }else{
                   isDataPresesnt = false;
@@ -128,6 +130,7 @@ int main(int argc, char** argv){
             if(time > global_counter){
               readLine = false;
             }else if(time == global_counter){
+              //cout<<global_counter<<endl;
               readLine = true;
               performOp( num1, num2, operation, &redBlackTree, &H);
             }
@@ -143,7 +146,7 @@ int main(int argc, char** argv){
             if(readLine && isDataPresesnt){
               if(getline (inputFile,line)){
                 if(line.length()>0)
-                cout<<line<<endl;
+                  //cout<<line<<endl;
                   getData(line, time, num1, num2, operation);
                 }else{
                   isDataPresesnt = false;
@@ -160,11 +163,13 @@ int main(int argc, char** argv){
           }//end of counter for
 
           if(currentWorking.getBuilding()->getTimeToComplete() == 0){
-            cout<<"completed : "<<global_counter-1<<" ";
-            currentWorking.getRBPtr()->print();
-            cout<<endl;
+            //cout<<"completed : "<<global_counter-1<<" ";
+            cout<<"("<<currentWorking.getBuilding()->getBuildingNum()<<","<<global_counter-1<<")"<<endl;
+            //currentWorking.getRBPtr()->print();
+            //cout<<endl;
             redBlackTree.deleteNode(currentWorking.getRBPtr());
-            H.print();
+            //H.print();
+            //redBlackTree.ino
           }else{
             H.insertNode(currentWorking);
           }

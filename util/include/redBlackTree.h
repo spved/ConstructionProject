@@ -33,12 +33,12 @@ private:
    RBNode *root;
 
   RBNode* BSTInsert(RBNode* root, RBNode* newNode);
-  void rotateRight(RBNode*& root, RBNode*& newNode);
-  void rotateLeft(RBNode*& root, RBNode*& newNode);
+  void rightRotateforInsert(RBNode*& root, RBNode*& newNode);
+  void leftRotateforInsert(RBNode*& root, RBNode*& newNode);
   void fixViolation(RBNode*& root, RBNode*& newNode);
   void inorderHelper(RBNode *root);
-  void rightRotate(RBNode *);
-  void leftRotate(RBNode *);
+  void rightRotateforDelete(RBNode *);
+  void leftRotateforDelete(RBNode *);
 
   void swapLeft(RBNode *, RBNode *);
   void swapRight(RBNode *, RBNode *);

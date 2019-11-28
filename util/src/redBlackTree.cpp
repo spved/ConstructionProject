@@ -40,7 +40,7 @@ RBNode* RBNode:: sibling() {
   }
 
 RBNode* RBNode :: uncle() {
-    // If no parent or grandparent, then no uncle
+    // If no parent or gParent, then no uncle
     if (parent == NULL or parent->parent == NULL)
       return NULL;
 
@@ -94,23 +94,18 @@ RBNode* redBlack:: BSTInsert(RBNode* root, RBNode* newNode){
     return root;
 }
 
-void redBlack::rotateLeft(RBNode *&root, RBNode *&newNode){
-    //cout<<"rotateLeft"<<endl;
+void redBlack::leftRotateforInsert(RBNode *&root, RBNode *&newNode){
+    //cout<<"leftRotateforInsert"<<endl;
     RBNode *newNode_right = newNode->right;
-
     newNode->right = newNode_right->left;
-
     if (newNode->right != NULL)
         newNode->right->parent = newNode;
-
     newNode_right->parent = newNode->parent;
 
     if (newNode->parent == NULL)
         root = newNode_right;
-
     else if (newNode == newNode->parent->left)
         newNode->parent->left = newNode_right;
-
     else
         newNode->parent->right = newNode_right;
 
@@ -118,12 +113,10 @@ void redBlack::rotateLeft(RBNode *&root, RBNode *&newNode){
     newNode->parent = newNode_right;
 }
 
-void redBlack::rotateRight(RBNode *&root, RBNode *&newNode){
-    //cout<<"rotateRight"<<endl;
+void redBlack::rightRotateforInsert(RBNode *&root, RBNode *&newNode){
+    //cout<<"rightRotateforInsert"<<endl;
     RBNode *newNode_left = newNode->left;
-
     newNode->left = newNode_left->right;
-
     if (newNode->left != NULL)
         newNode->left->parent = newNode;
 
@@ -131,10 +124,8 @@ void redBlack::rotateRight(RBNode *&root, RBNode *&newNode){
 
     if (newNode->parent == NULL)
         root = newNode_left;
-
     else if (newNode == newNode->parent->left)
         newNode->parent->left = newNode_left;
-
     else
         newNode->parent->right = newNode_left;
 
@@ -145,28 +136,25 @@ void redBlack::rotateRight(RBNode *&root, RBNode *&newNode){
 void redBlack::fixViolation(RBNode *&root, RBNode *&newNode){
     //cout<<"lets fix"<<endl;
     RBNode *parentNewNode = NULL;
-    RBNode *grandParentNewNode = NULL;
+    RBNode *gParentNewNode = NULL;
 
     while ((newNode != root) && (newNode->color != BLACK) &&
            (newNode->parent->color == RED)){
 
         parentNewNode = newNode->parent;
-        grandParentNewNode = newNode->parent->parent;
+        gParentNewNode = newNode->parent->parent;
 
         /*  Case : A
             Parent of newNode is left child of Grand-parent of newNode */
-        if (parentNewNode == grandParentNewNode->left){
+        if (parentNewNode == gParentNewNode->left){
+            RBNode *uncleNewNode = gParentNewNode->right;
 
-            RBNode *uncleNewNode = grandParentNewNode->right;
-
-            /* Case : 1
-               The uncle of newNode is also red
-               Only Recoloring required */
+            /* Case : 1 */
             if (uncleNewNode != NULL && uncleNewNode->color == RED){
-                grandParentNewNode->color = RED;
+                gParentNewNode->color = RED;
                 parentNewNode->color = BLACK;
                 uncleNewNode->color = BLACK;
-                newNode = grandParentNewNode;
+                newNode = gParentNewNode;
             }
 
             else{
@@ -174,41 +162,39 @@ void redBlack::fixViolation(RBNode *&root, RBNode *&newNode){
                    newNode is right child of its parent
                    Left-rotation required */
                 if (newNode == parentNewNode->right){
-                    rotateLeft(root, parentNewNode);
+                    leftRotateforInsert(root, parentNewNode);
                     newNode = parentNewNode;
                     parentNewNode = newNode->parent;
                 }
-
-                rotateRight(root, grandParentNewNode);
-                swap(parentNewNode->color, grandParentNewNode->color);
+                rightRotateforInsert(root, gParentNewNode);
+                swap(parentNewNode->color, gParentNewNode->color);
                 newNode = parentNewNode;
             }
         }
         else{
-            RBNode *uncleNewNode = grandParentNewNode->left;
+            RBNode *uncleNewNode = gParentNewNode->left;
 
             if ((uncleNewNode != NULL) && (uncleNewNode->color == RED)){
-                grandParentNewNode->color = RED;
+                gParentNewNode->color = RED;
                 parentNewNode->color = BLACK;
                 uncleNewNode->color = BLACK;
-                newNode = grandParentNewNode;
+                newNode = gParentNewNode;
             }
             else{
                 if (newNode == parentNewNode->left){
-                    rotateRight(root, parentNewNode);
+                    rightRotateforInsert(root, parentNewNode);
                     newNode = parentNewNode;
                     parentNewNode = newNode->parent;
                 }
 
-                rotateLeft(root, grandParentNewNode);
-                swap(parentNewNode->color, grandParentNewNode->color);
+                leftRotateforInsert(root, gParentNewNode);
+                swap(parentNewNode->color, gParentNewNode->color);
                 newNode = parentNewNode;
             }
         }
     }
-
+    //mark root to black
     root->color = BLACK;
-    //root->dataNode->print();
 }
 
 void redBlack:: printInOrder(){
@@ -226,58 +212,59 @@ void redBlack:: inorderHelper(RBNode *root){
     inorderHelper(root->right);
 }
 
-void redBlack:: fixRedRed(RBNode *x) {
-    // if x is root color it black and return
-    if (x == root) {
-      x->color = BLACK;
+void redBlack:: fixRedRed(RBNode *theNode) {
+    // if theNode is root color it black and return
+    if (theNode == root) {
+      theNode->color = BLACK;
       return;
     }
 
-    // initialize parent, grandparent, uncle
-    RBNode *parent = x->parent, *grandparent = parent->parent,
-         *uncle = x->uncle();
+    // initialize parent, gParent, uncle
+    RBNode *parent = theNode->parent, *gParent = parent->parent,
+         *uncle = theNode->uncle();
 
     if (parent->color != BLACK) {
       if (uncle != NULL && uncle->color == RED) {
         // uncle red, perform recoloring and recurse
         parent->color = BLACK;
         uncle->color = BLACK;
-        grandparent->color = RED;
-        fixRedRed(grandparent);
+        gParent->color = RED;
+        fixRedRed(gParent);
       } else {
         // Else perform LR, LL, RL, RR
         if (parent->isOnLeft()) {
-          if (x->isOnLeft()) {
+          if (theNode->isOnLeft()) {
             // for left right
-            swap(parent->color, grandparent->color);
+            swap(parent->color, gParent->color);
           } else {
-            leftRotate(parent);
-            swap(x->color, grandparent->color);
+            leftRotateforDelete(parent);
+            swap(theNode->color, gParent->color);
           }
           // for left left and left right
-          rightRotate(grandparent);
+          rightRotateforDelete(gParent);
         } else {
-          if (x->isOnLeft()) {
+          if (theNode->isOnLeft()) {
             // for right left
-            rightRotate(parent);
-            swap(x->color, grandparent->color);
+            rightRotateforDelete(parent);
+            swap(theNode->color, gParent->color);
           } else {
-            swap(parent->color, grandparent->color);
+            swap(parent->color, gParent->color);
           }
 
           // for right right and right left
-          leftRotate(grandparent);
+          leftRotateforDelete(gParent);
         }
       }
     }
   }
 
-void redBlack:: fixDoubleBlack(RBNode *x) {
-      if (x == root)
+void redBlack:: fixDoubleBlack(RBNode *theNode) {
+      //theNode->print();
+      if (theNode == root)
         // Reached root
         return;
 
-      RBNode *sibling = x->sibling(), *parent = x->parent;
+      RBNode *sibling = theNode->sibling(), *parent = theNode->parent;
       if (sibling == NULL) {
         // No sibiling, double black pushed up
         fixDoubleBlack(parent);
@@ -288,12 +275,12 @@ void redBlack:: fixDoubleBlack(RBNode *x) {
           sibling->color = BLACK;
           if (sibling->isOnLeft()) {
             // left case
-            rightRotate(parent);
+            rightRotateforDelete(parent);
           } else {
             // right case
-            leftRotate(parent);
+            leftRotateforDelete(parent);
           }
-          fixDoubleBlack(x);
+          fixDoubleBlack(theNode);
         } else {
           // Sibling black
           if (sibling->hasRedChild()) {
@@ -303,24 +290,24 @@ void redBlack:: fixDoubleBlack(RBNode *x) {
                 // left left
                 sibling->left->color = sibling->color;
                 sibling->color = parent->color;
-                rightRotate(parent);
+                rightRotateforDelete(parent);
               } else {
                 // right left
                 sibling->left->color = parent->color;
-                rightRotate(sibling);
-                leftRotate(parent);
+                rightRotateforDelete(sibling);
+                leftRotateforDelete(parent);
               }
             } else {
               if (sibling->isOnLeft()) {
                 // left right
                 sibling->right->color = parent->color;
-                leftRotate(sibling);
-                rightRotate(parent);
+                leftRotateforDelete(sibling);
+                rightRotateforDelete(parent);
               } else {
                 // right right
                 sibling->right->color = sibling->color;
                 sibling->color = parent->color;
-                leftRotate(parent);
+                leftRotateforDelete(parent);
               }
             }
             parent->color = BLACK;
@@ -336,8 +323,8 @@ void redBlack:: fixDoubleBlack(RBNode *x) {
       }
     }
 
-RBNode* redBlack:: successor(RBNode *x) {
-    RBNode *temp = x;
+RBNode* redBlack:: successor(RBNode *theNode) {
+    RBNode *temp = theNode;
 
     while (temp->left != NULL)
       temp = temp->left;
@@ -345,244 +332,224 @@ RBNode* redBlack:: successor(RBNode *x) {
     return temp;
   }
 
-RBNode* redBlack:: BSTreplace(RBNode *x) {
+RBNode* redBlack:: BSTreplace(RBNode *theNode) {
     // when node have 2 children
-    if (x->left != NULL and x->right != NULL)
-      return successor(x->right);
+    if (theNode->left != NULL and theNode->right != NULL)
+      return successor(theNode->right);
 
-    // when leaf
-    if (x->left == NULL and x->right == NULL)
+    // No successor for leaf node
+    if (theNode->left == NULL and theNode->right == NULL)
       return NULL;
 
     // when single child
-    if (x->left != NULL)
-      return x->left;
+    if (theNode->left != NULL)
+      return theNode->left;
     else
-      return x->right;
+      return theNode->right;
   }
 
-void redBlack:: swapLeft(RBNode* x, RBNode* y){
-  if(x->left)
-    x->left->parent = y;
-  swap(x->left, y->left);
+void redBlack:: swapLeft(RBNode* theNode, RBNode* y){
+  if(theNode->left)
+    theNode->left->parent = y;
+  swap(theNode->left, y->left);
 }
 
-void redBlack:: swapRight(RBNode* x, RBNode* y){
-  if(x->parent->left == x){
-    if(x->right && y->right)
-        swap(x->right->parent, y->right->parent);
-      else if(x->right)
-        x->right->parent = y;
-      else if(y->right)
-        y->right->parent = x;
-        swap(x->right, y->right);
-    }else{
+/*
+ * This function will swap position of Nodes by
+ * changing pointers and not data swapping
+ */
+void redBlack:: swapNodes(RBNode* theNode, RBNode* y){
 
-      x->right = y->right;
-      y->right->parent = x;
-      y->right = x;
-  }
-}
-
-void redBlack:: swapParent(RBNode* x, RBNode* y){
-  //RBNode *xParentChild = NULL, *yParentChild = NULL;
-  if(x->parent){
-    if(x->parent->left == x)
-      x->parent->left = y;
-    else
-      x->parent->right = y;
-  }
-  if(y->parent->left == y){
-    y->parent->left = x;
-    swap(x->parent, y->parent);
-  }else{
-    y->parent = x->parent;
-    x->parent = y;
-  }
-}
-
-void redBlack:: swapNodes(RBNode* x, RBNode* y){
-  /*
-  //swap parents
-    swapParent(x,y);
-  //swap left
-    swapLeft(x,y);
-  //swap righ
-    swapRight(x,y);
-  */
-  /*swapLeft(x,y);
-  swapParent(x,y);
-  swapRight(x,y);
+  /*swapLeft;
+  swapParent;
+  swapRight;
   */
 
-  if(x->left)
-    x->left->parent = y;
-  swap(x->left, y->left);
+  if(theNode->left)
+    theNode->left->parent = y;
+  swap(theNode->left, y->left);
 
-  if(x->parent){
-    if(x->parent->left == x)
-      x->parent->left = y;
+  if(theNode->parent){
+    if(theNode->parent->left == theNode)
+      theNode->parent->left = y;
     else
-      x->parent->right = y;
+      theNode->parent->right = y;
   }
   if(y->parent->left == y){
-    y->parent->left = x;
-    swap(x->parent, y->parent);
+    y->parent->left = theNode;
+    swap(theNode->parent, y->parent);
 
-    if(x->right && y->right)
-        swap(x->right->parent, y->right->parent);
-    else if(x->right)
-        x->right->parent = y;
+    if(theNode->right && y->right)
+        swap(theNode->right->parent, y->right->parent);
+    else if(theNode->right)
+        theNode->right->parent = y;
     else if(y->right)
-        y->right->parent = x;
-    swap(x->right, y->right);
+        y->right->parent = theNode;
+    swap(theNode->right, y->right);
   }else{
     if(y->right){
-      y->right->parent = x;
-      x->right = y->right;
+      y->right->parent = theNode;
+      theNode->right = y->right;
     }else{
-      x->right = NULL;
+      theNode->right = NULL;
     }
-    y->right = x;
-    y->parent = x->parent;
-    x->parent = y;
+    y->right = theNode;
+    y->parent = theNode->parent;
+    theNode->parent = y;
   }
 }
-
-void redBlack:: deleteNode(RBNode* v){
-  if(v == NULL)
+/*
+ * function to delete node from RB Tree
+ */
+void redBlack:: deleteNode(RBNode* theNode){
+  if(theNode == NULL)
     return;
-  RBNode *u = BSTreplace(v);
+  RBNode *successor = BSTreplace(theNode);
 
       // True when u and v are both black
-      bool uvBlack = ((u == NULL or u->color == BLACK) and (v->color == BLACK));
-      RBNode *parent = v->parent;
+      bool uvBlack = ((successor == NULL or successor->color == BLACK) and (theNode->color == BLACK));
+      RBNode *parent = theNode->parent;
 
-      if (u == NULL) {
-        // u is NULL therefore v is leaf
-        if (v == root) {
+      if (successor == NULL) {
+        // successor is NULL therefore v is leaf
+        if (theNode == root) {
+          //cout<<"Delete case 1"<<endl;
+
           // v is root, making root null
+          //cout<<"reached here";
           root = NULL;
         } else {
+          //cout<<"Delete case 2"<<endl;
           if (uvBlack) {
             // u and v both black
             // v is leaf, fix double black at v
-            fixDoubleBlack(v);
+            fixDoubleBlack(theNode);
           } else {
-            // u or v is red
-            if (v->sibling() != NULL)
+            // successor or v is red
+            if (theNode->sibling() != NULL)
               // sibling is not null, make it red"
-              v->sibling()->color = RED;
+              theNode->sibling()->color = RED;
           }
 
           // delete v from the tree
-          if (v->isOnLeft()) {
+          if (theNode->isOnLeft()) {
             parent->left = NULL;
           } else {
             parent->right = NULL;
           }
         }
-        delete v;
+        delete theNode;
         return;
       }
 
-      if (v->left == NULL or v->right == NULL) {
-        // v has 1 child
-        if (v == root) {
-          // v is root, assign the value of u to v, and delete u
-          v->dataNode = u->dataNode;
-          v->left = v->right = NULL;
-          delete u;
+      if (theNode->left == NULL or theNode->right == NULL) {
+
+        // theNode has 1 child
+        if (theNode == this->root) {
+          //cout<<"Delete case 3"<<endl;
+
+          // v is root, assign the value of successor to v,
+          //theNode->dataNode = u->dataNode;
+          //cout<<"Making u root"<<endl;
+          theNode->left = theNode->right = NULL;
+          this->root = successor;
+          successor->parent = NULL;
+          delete theNode;
+          return;
         } else {
+          //cout<<"Delete case 4";
+
           // Detach v from tree and move u up
-          if (v->isOnLeft()) {
-            parent->left = u;
+          if (theNode->isOnLeft()) {
+            parent->left = successor;
           } else {
-            parent->right = u;
+            parent->right = successor;
           }
-          delete v;
-          u->parent = parent;
+          delete theNode;
+          successor->parent = parent;
           if (uvBlack) {
+            //u->print();
+            //cout<<" Fixing uvBlack"<<endl;
             // u and v both black, fix double black at u
-            fixDoubleBlack(u);
+            fixDoubleBlack(successor);
           } else {
             // u or v red, color u black
-            u->color = BLACK;
+            successor->color = BLACK;
           }
         }
         return;
       }
 
-      // v has 2 children, swap values with successor and recurse
-      //swap(u->dataNode, v->dataNode);
+      // theNode has 2 children, swap two nodes such that it changes all values with successor]
 
       //swap Nodes
-      if(this->root == v)
-        this->root = u;
-      swapNodes(v,u);
-      deleteNode(v);
+      //cout<<"Delete case 5"<<endl;
+      if(this->root == theNode)
+        this->root = successor;
+      swapNodes(theNode,successor);
+      deleteNode(theNode);
 }
 
-void redBlack:: leftRotate(RBNode *x) {
+void redBlack:: leftRotateforDelete(RBNode *theNode) {
     // new parent will be node's right child
-    RBNode *nParent = x->right;
+    RBNode *nParent = theNode->right;
 
     // update root if current node is root
-    if (x == root)
+    if (theNode == root)
       root = nParent;
 
-    x->moveDown(nParent);
+    theNode->moveDown(nParent);
 
-    // connect x with new parent's left element
-    x->right = nParent->left;
+    // connect theNode with new parent's left element
+    theNode->right = nParent->left;
     // connect new parent's left element with node
     // if it is not null
     if (nParent->left != NULL)
-      nParent->left->parent = x;
+      nParent->left->parent = theNode;
 
-    // connect new parent with x
-    nParent->left = x;
+    // connect new parent with theNode
+    nParent->left = theNode;
   }
 
-void redBlack :: rightRotate(RBNode *x) {
+void redBlack :: rightRotateforDelete(RBNode *theNode) {
     // new parent will be node's left child
-    RBNode *nParent = x->left;
+    RBNode *nParent = theNode->left;
 
     // update root if current node is root
-    if (x == root)
+    if (theNode == root)
       root = nParent;
 
-    x->moveDown(nParent);
+    theNode->moveDown(nParent);
 
-    // connect x with new parent's right element
-    x->left = nParent->right;
+    // connect theNode with new parent's right element
+    theNode->left = nParent->right;
     // connect new parent's right element with node
     // if it is not null
     if (nParent->right != NULL)
-      nParent->right->parent = x;
+      nParent->right->parent = theNode;
 
-    // connect new parent with x
-    nParent->right = x;
+    // connect new parent with theNode
+    nParent->right = theNode;
   }
 
 void redBlack:: printBuilding(int buildingNum){
   search(this->root, buildingNum);
 }
 
-void redBlack:: search(RBNode *x, int buildingNum){
-  if (x == NULL){
+void redBlack:: search(RBNode *theNode, int buildingNum){
+  if (theNode == NULL){
     cout<<"(0,0,0)"<<endl;
     return;
   }
-  if(x->dataNode->getBuildingNum() == buildingNum){
-      x->dataNode->print();
+  if(theNode->dataNode->getBuildingNum() == buildingNum){
+      theNode->dataNode->print();
       cout<<endl;
   }
-  else if (x->dataNode->getBuildingNum() > buildingNum){
-      search(x->left, buildingNum);
+  else if (theNode->dataNode->getBuildingNum() > buildingNum){
+      search(theNode->left, buildingNum);
   }
   else{
-      search(x->right, buildingNum);
+      search(theNode->right, buildingNum);
   }
 }
 
@@ -591,29 +558,30 @@ void redBlack:: printBuildingRange(int lower, int upper){
   cout<<endl;
 }
 
-void redBlack:: searchRange(RBNode *x, int lower, int upper){
+void redBlack:: searchRange(RBNode *theNode, int lower, int upper){
   comma = 0;
-  if (x == NULL){
+  if (theNode == NULL){
     cout<<"(0,0,0)";
     return;
   }
-  if (x->dataNode->getBuildingNum() > upper){
-    searchRange(x->left, lower, upper);
-  }else if(x->dataNode->getBuildingNum() < lower){
-    searchRange(x->right, lower, upper);
+  if (theNode->dataNode->getBuildingNum() > upper){
+    searchRange(theNode->left, lower, upper);
+  }else if(theNode->dataNode->getBuildingNum() < lower){
+    searchRange(theNode->right, lower, upper);
   }else{
-    rangeInorder(x, lower, upper);
+    rangeInorder(theNode, lower, upper);
   }
 }
 
 void redBlack:: rangeInorder(RBNode *root, int lower, int upper){
     if (root == NULL)
         return;
-    if (root->dataNode->getBuildingNum() >= lower){
+    if (root->dataNode->getBuildingNum() >= lower && root->dataNode->getBuildingNum() <= upper){
       rangeInorder(root->left, lower, upper);
       if(comma)
         cout<<",";
       root->dataNode->print();
+      comma=1;
+      rangeInorder(root->right, lower, upper);
     }
-    rangeInorder(root->right, lower, upper);
 }
